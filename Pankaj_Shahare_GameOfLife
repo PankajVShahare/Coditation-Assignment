@@ -1,0 +1,176 @@
+import java.util.*;
+public final class Pankaj_Shahare_GameOfLife 
+{
+    // The value representing a dead cell
+    public final static int DEAD    = 0x00;
+   
+    // The value representing a live cell
+    public final static int LIVE    = 0x01;
+
+    public final static void main(String[] args) 
+    {
+                  // test the game of life implementation
+        Pankaj_Shahare_GameOfLife gof = new Pankaj_Shahare_GameOfLife();
+        gof.test(); 
+    }
+    private void test() 
+    {
+        Scanner sc = new Scanner(System.in);
+
+	
+	System.out.print("\n Enter number of rows for the board ");
+	int R = sc.nextInt();
+	System.out.print("\n Enter number of columns for the board ");
+	int C = sc.nextInt();
+
+	int[][] board = new int[R][C];
+	System.out.println("\n Enter "+R*C+" Elements in board 
+                               (0 for Dead cell / 1 for Live cell ) ");	
+	for(int i=0; i<R; i++)
+	{
+		for(int j=0; j<C; j++)
+		{
+			board[i][j] = sc.nextInt();
+		}
+	}
+	System.out.print("\n\t\t GameOfLife ");
+
+	System.out.print("\n\t 1. Current state of Board ");
+	System.out.print("\n\t 2. Next state of Board ");
+	System.out.print("\n\t 3. Check State of Cell ");
+	System.out.print("\n\t 4. Exit ");
+	
+       int choice=0;
+       do 
+       {
+	 System.out.print("\n\t Enter Your Choice : ");
+	 choice = sc.nextInt();
+	
+	 switch(choice)  //switch case for the choices
+	 {
+	   //for printing current board
+		case 1:  
+			printBoard(board);
+			break;
+            //for printing next generation board
+		case 2: 
+			int[][] NextGenboard = new int[5][5];
+	            	NextGenboard = getNextBoard(board);
+            		printBoard(NextGenboard);
+			break;
+           //for getting each cell status
+		case 3:
+			System.out.print("\n Enter row number : ");
+			int r = sc.nextInt();
+			System.out.print("\n Enter Column number : ");
+			int c = sc.nextInt();
+
+			if(board[r][c]== LIVE)
+			  System.out.print(" Cell is Live ");
+			else
+			  System.out.print(" Cell is Dead ");
+	   //Exit from the program
+		case 4:
+			break;
+	 }
+      }while(choice!=4); //if and only if we want to break the program
+   }
+   private void printBoard(int[][] board) 
+   {
+      for (int i = 0, e = board.length ; i < e ; i++) 
+      {
+        for (int j = 0, f = board[i].length ; j < f ; j++) 
+        {
+           System.out.print(Integer.toString(board[i][j]) + ",");
+        } 
+        System.out.println();
+      }
+   }
+   public int[][] getNextBoard(int[][] board) 
+   {
+      // The board does not have any values so return the newly created playing field.
+       if (board.length == 0 || board[0].length == 0) 
+       {
+            throw new IllegalArgumentException("Board must have a positive amount of rows and/or columns");
+       }
+
+       int nrRows = board.length;
+       int nrCols = board[0].length;
+
+      // temporary board to store new values
+       int[][] buf = new int[nrRows][nrCols];
+
+       for (int row = 0 ; row < nrRows ; row++) 
+       {
+          for (int col = 0 ; col < nrCols ; col++) 
+          {
+                buf[row][col] = getNewCellState(board[row][col], getLiveNeighbours(row, col, board));
+          }
+       }   
+       return buf;
+    }
+    private int getLiveNeighbours(int cellRow, int cellCol, int[][] board)
+    {
+        int liveNeighbours = 0;
+        int rowEnd = Math.min(board.length , cellRow + 2);
+        int colEnd = Math.min(board[0].length, cellCol + 2);
+
+        for (int row = Math.max(0, cellRow - 1) ; row < rowEnd ; row++) 
+        {
+           for (int col = Math.max(0, cellCol - 1) ; col < colEnd ; col++) 
+           {
+             // make sure to exclude the cell itself from calculation
+             if ((row != cellRow || col != cellCol) && board[row][col] == LIVE) 
+             {
+                 liveNeighbours++;
+             }
+           }
+        }
+        return liveNeighbours;
+    }
+    private int getNewCellState(int curState, int liveNeighbours) 
+    {
+       int newState = curState;
+ 
+       switch (curState) 
+       {
+          case LIVE:
+
+            // Any live cell with fewer than two 
+            // live neighbours dies
+            if (liveNeighbours < 2) 
+            {
+                newState = DEAD;
+            }
+
+            // Any live cell with two or three live   
+            // neighbours lives on to the next generation.
+            if (liveNeighbours == 2 || liveNeighbours == 3) 
+            {
+                newState = LIVE;
+            }
+
+            // Any live cell with more than three live neighbours
+            // dies, as if by overcrowding.
+            if (liveNeighbours > 3) 
+            {
+                newState = DEAD;
+            }
+            break;
+
+        case DEAD:
+            // Any dead cell with exactly three live neighbours becomes a 
+            // live cell, as if by reproduction.
+            if (liveNeighbours == 3) 
+            {
+                newState = LIVE;
+            }
+            break;
+
+        default:
+            throw new IllegalArgumentException("State of cell must be either LIVE or DEAD");
+     }			
+        
+     return newState;
+   }  //end of getNewCellState method
+} //end of class 
